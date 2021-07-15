@@ -15,7 +15,7 @@ var connection = mysql.createConnection({
 connection.connect();
 
 app.get('/select', function (req, res) {
-  let category = parseInt(req.query.category);
+  
   try{
     connection.query('SELECT category FROM categories_v2 WHERE active = 1', function(err, rows, fields) {
     if (err) {
@@ -34,9 +34,9 @@ app.get('/select', function (req, res) {
 });
 
 app.get('/ranking', function (req, res) {
-  let category = parseInt(req.query.category);
+  let category = req.query.category;
   try{
-    connection.query('SELECT affiliate_number, name, lastname, ranking_points FROM prueba.players where category =' + category + ' ORDER BY ranking_points desc ', function(err, rows, fields) {
+    connection.query('SELECT affiliate_number, name, last_name, ranking_points FROM prueba.players_v2 where category =' + category + ' AND active = 1 ORDER BY ranking_points desc ', function(err, rows, fields) {
     if (err) {
       res.json({
         error: err.message
