@@ -17,7 +17,7 @@ connection.connect();
 app.get('/search', function (req, res) {
   let name = req.query.name;
   try{
-    connection.query("SELECT affiliate_number, name, last_name, category, ranking_points FROM prueba.players_v2 WHERE concat(name, ' ', last_name) LIKE '%" + name + "%'ORDER BY name asc" , function(err, rows, fields) {
+    connection.query("SELECT affiliate_number, name, last_name, category, ranking_points FROM prueba.players_v2 WHERE concat(name, ' ', last_name) LIKE '%" + name + "%'ORDER BY ranking_points desc" , function(err, rows, fields) {
     if (err) {
       res.json({
         error: err.message
@@ -217,6 +217,111 @@ app.delete('/category', function (req, res) {
   let category = req.query.category
   try{
     connection.query("UPDATE categories_v2 SET active=0 WHERE category='" + category + "'", function(err, rows, fields) {
+    if (err) {
+      res.json({
+        error: err.message
+      });
+    }
+    res.json(rows);
+  });
+ }
+ catch(error){
+   res.json({
+     error: error.message
+   });
+ }
+});
+
+app.get('/users', function (req, res) {
+  try{
+    connection.query('SELECT email, admin, user, active FROM accounts_v2 ORDER BY active desc, email asc', function(err, rows, fields) {
+    if (err) {
+      res.json({
+        error: err.message
+      });
+    }
+    res.json(rows);
+  });
+ }
+ catch(error){
+   res.json({
+     error: error.message
+   });
+ }
+});
+
+app.get('/user', function (req, res) {
+  let user = req.query.user
+  try{
+    connection.query("SELECT email, admin, user, active FROM accounts_v2 WHERE email='" + user + "'", function(err, rows, fields) {
+    if (err) {
+      res.json({
+        error: err.message
+      });
+    }
+    
+    if(rows && rows.length>0){
+      res.json(rows[0]);
+    }
+    else{
+      res.json({})
+    }
+  });
+ }
+ catch(error){
+   res.json({
+     error: error.message
+   });
+ }
+});
+
+app.delete('/user', function (req, res) {
+  let user  = req.query.user
+  try{
+    connection.query("UPDATE accounts_v2 SET admin=0, user=0, active=0 WHERE email='" + user + "'", function(err, rows, fields) {
+    if (err) {
+      res.json({
+        error: err.message
+      });
+    }
+    res.json(rows);
+  });
+ }
+ catch(error){
+   res.json({
+     error: error.message
+   });
+ }
+});
+
+app.post('/user', function (req, res) {
+  let mail  = req.query.mail
+  let admin  = (req.query.admin=="true" ? "1" :"0")
+  let user  = (req.query.user=="true" ? "1" :"0")
+  let active  = (req.query.active=="true" ? "1" :"0")
+  try{
+    connection.query("UPDATE accounts_v2 SET admin=" + admin + ", user=" + user + ", active=" + active + " WHERE email='" + mail + "'", function(err, rows, fields) {
+    if (err) {
+      res.json({
+        error: err.message
+      });
+    }
+    res.json(rows);
+  });
+ }
+ catch(error){
+   res.json({
+     error: error.message
+   });
+ }
+});
+
+app.put('/user', function (req, res) {
+  let mail  = req.query.mail
+  let admin  = (req.query.admin=="true" ? "1" :"0")
+  let user  = (req.query.user=="true" ? "1" :"0")
+  try{
+    connection.query("INSERT INTO accounts_v2 VALUES('" + mail + "', " + admin + ", " + user + ", 1)", function(err, rows, fields) {
     if (err) {
       res.json({
         error: err.message
